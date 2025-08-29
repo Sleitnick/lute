@@ -23,4 +23,16 @@ function crypto.password.verify(hash: buffer, password: string): boolean
 	error("not implemented")
 end
 
+function crypto.bytes(numBytes: number): buffer
+	error("not implemented")
+end
+
+function crypto.pbkdf2(password: string, salt: buffer, iterations: number): buffer
+	error("not implemented")
+end
+
+function crypto.hmacsha256(message: buffer, key: buffer): buffer
+	error("not implemented")
+end
+
 return crypto

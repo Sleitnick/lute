@@ -3,10 +3,14 @@
 
 #include "lualib.h"
 #include "openssl/digest.h"
+#include "openssl/rand.h"
+#include "openssl/evp.h"
+#include "openssl/hmac.h"
 #include "sodium/crypto_pwhash.h"
 
 #include <string>
 #include <vector>
+#include <cstring>
 
 namespace crypto
 {
@@ -143,6 +147,79 @@ namespace crypto
         // verify
         lua_pushcfunction(L, lua_pwhash_verify, kVerifyPasswordHashName);
         lua_setfield(L, -2, kVerifyPasswordHashName);
+
+        return 1;
+    }
+
+    int lua_bytes(lua_State* L)
+    {
+        int n_bytes = luaL_checkinteger(L, 1);
+        luaL_argcheck(L, n_bytes > 0, 1, "number of bytes must be greater than 0");
+
+        size_t len = static_cast<size_t>(n_bytes);
+        uint8_t* buf = static_cast<uint8_t*>(lua_newbuffer(L, len));
+
+        RAND_bytes(buf, len);
+
+        return 1;
+    }
+
+    int lua_pbkdf2(lua_State* L)
+    {
+        size_t password_len;
+        const char* password = luaL_checklstring(L, 1, &password_len);
+
+        size_t salt_len;
+        const uint8_t* salt = static_cast<const uint8_t*>(luaL_checkbuffer(L, 2, &salt_len));
+
+        int iter = luaL_checkinteger(L, 3);
+        luaL_argcheck(L, iter > 0, 3, "iterations must be greater than 0");
+
+        constexpr size_t key_len = 32;
+        static uint8_t out_key[key_len];
+
+        int res = PKCS5_PBKDF2_HMAC(password, password_len, salt, salt_len, static_cast<uint32_t>(iter), EVP_sha256(), key_len, out_key);
+
+        if (!res)
+        {
+            luaL_errorL(L, "pbkdf2 failed");
+        }
+
+        void* key_buf = lua_newbuffer(L, key_len);
+        memcpy(key_buf, out_key, key_len);
+
+        return 1;
+    }
+
+    int lua_hmacsha256(lua_State* L)
+    {
+        size_t message_len;
+        void* message = luaL_checkbuffer(L, 1, &message_len);
+
+        size_t key_len;
+        void* key = luaL_checkbuffer(L, 2, &key_len);
+
+        uint8_t out[EVP_MAX_MD_SIZE];
+        unsigned int out_len;
+
+        // HMAC SHA256 digest here
+        uint8_t* res = HMAC(
+            EVP_sha256(),
+            key,
+            key_len,
+            static_cast<const uint8_t*>(message),
+            message_len,
+            out,
+            &out_len
+        );
+
+        if (!res)
+        {
+            luaL_errorL(L, "hmacsha256 failed");
+        }
+
+        void* out_buf = lua_newbuffer(L, static_cast<size_t>(out_len));
+        memcpy(out_buf, out, static_cast<size_t>(out_len));
 
         return 1;
     }

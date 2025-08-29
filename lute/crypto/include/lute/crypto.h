@@ -25,8 +25,20 @@ int lua_pwhash(lua_State* L);
 static const char kVerifyPasswordHashName[] = "verify";
 int lua_pwhash_verify(lua_State* L);
 
+static const char kBytesName[] = "bytes";
+int lua_bytes(lua_State* L);
+
+static const char kPbkdf2Name[] = "pbkdf2";
+int lua_pbkdf2(lua_State* L);
+
+static const char kHmacSha256Name[] = "hmacsha256";
+int lua_hmacsha256(lua_State* L);
+
 static const luaL_Reg lib[] = {
     {kDigestName, lua_digest},
+    {kBytesName, lua_bytes},
+    {kPbkdf2Name, lua_pbkdf2},
+    {kHmacSha256Name, lua_hmacsha256},
     {nullptr, nullptr}
 };
 

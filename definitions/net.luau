@@ -45,4 +45,12 @@ function net.serve(config: Handler | Configuration)
 	error("not implemented")
 end
 
+function net.endianswap16(n: number): number
+	error("not implemented")
+end
+
+function net.endianswap32(n: number): number
+	error("not implemented")
+end
+
 return net

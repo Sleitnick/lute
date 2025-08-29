@@ -5,3 +5,4 @@ constexpr int kDurationTag       = 127;
 constexpr int kInstantTag        = 126;
 constexpr int kCompilerResultTag = 125;
 constexpr int kWatchHandleTag    = 124;
+constexpr int kSocketTag         = 123;

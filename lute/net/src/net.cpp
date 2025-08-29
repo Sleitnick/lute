@@ -683,6 +683,34 @@ int lua_serve(lua_State* L)
     return 1;
 }
 
+int lua_endianswap16(lua_State* L)
+{
+    int32_t n = luaL_checkinteger(L, 1);
+    
+    lua_pushinteger(
+        L,
+        ((n & 0x00ff) << 8) |
+        ((n & 0xff00) >> 8)
+    );
+    
+    return 1;
+}
+
+int lua_endianswap32(lua_State* L)
+{
+    int32_t n = luaL_checkinteger(L, 1);
+    
+    lua_pushinteger(
+        L,
+        ((n & 0x000000ff) << 24) |
+        ((n & 0x0000ff00) << 8) |
+        ((n & 0x00ff0000) >> 8) |
+        ((n & 0xff000000) >> 24)
+    );
+
+    return 1;
+}
+
 } // namespace net
 
 struct CurlHolder

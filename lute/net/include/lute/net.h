@@ -15,9 +15,14 @@ int request(lua_State* L);
 
 int lua_serve(lua_State* L);
 
+int lua_endianswap16(lua_State* L);
+int lua_endianswap32(lua_State* L);
+
 static const luaL_Reg lib[] = {
     {"request", request},
     {"serve", lua_serve},
+    {"endianswap16", lua_endianswap16},
+    {"endianswap32", lua_endianswap32},
     {nullptr, nullptr},
 };
 
